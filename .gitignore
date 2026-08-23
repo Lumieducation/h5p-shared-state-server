@@ -1,0 +1,8 @@
+node_modules
+build
+build-ide
+coverage
+typedoc
+example/build
+example/h5p
+*.log

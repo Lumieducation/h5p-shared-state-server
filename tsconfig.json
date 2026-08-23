@@ -1,0 +1,10 @@
+/** Only used for IDE integration and linting. **/
+{
+    "extends": "./tsconfig.build.json",
+    "exclude": ["node_modules", "**.d.ts", "example"],
+    "include": ["src/**/*", "test/**/*"],
+    "compilerOptions": {
+        "outDir": "./build-ide",
+        "types": ["vitest/globals"]
+    }
+}

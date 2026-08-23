@@ -1,0 +1,69 @@
+name: CI
+
+on:
+    push:
+        branches:
+            - '**'
+    pull_request:
+    workflow_dispatch:
+
+env:
+    NODE_VERSION: '24.19.0'
+
+jobs:
+    install-build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+            - run: npm ci
+            - run: npm run build
+            - uses: actions/upload-artifact@v4
+              with:
+                  name: workspace
+                  retention-days: 1
+                  include-hidden-files: true
+                  path: |
+                      node_modules
+                      build
+
+    lint:
+        needs: install-build
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+            - uses: actions/download-artifact@v4
+              with:
+                  name: workspace
+            - run: npm run lint
+
+    format:
+        needs: install-build
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+            - uses: actions/download-artifact@v4
+              with:
+                  name: workspace
+            - run: npm run format:check
+
+    unit-tests:
+        needs: install-build
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+            - uses: actions/download-artifact@v4
+              with:
+                  name: workspace
+            - run: npx vitest run --config vitest.config.ts --coverage

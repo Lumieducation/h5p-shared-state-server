@@ -1,0 +1,44 @@
+{
+    "name": "h5p-shared-state-server-example",
+    "version": "1.0.0",
+    "private": true,
+    "description": "Runnable example server demonstrating @lumieducation/h5p-shared-state-server",
+    "scripts": {
+        "build": "npx tsc -P ./tsconfig.build.json",
+        "postinstall": "sh download-core.sh 2aeb0b83fa603e331381b3a6b8bf42c3773ba140 ab2daa18bd61b19e7f8729e22eec88f3b637a868",
+        "start": "npx ts-node -P ./tsconfig.build.json src/index.ts",
+        "start:watch": "npx ts-node-dev --deps --respawn src/index.ts"
+    },
+    "author": "S. Rettig",
+    "license": "GPL-3.0",
+    "dependencies": {
+        "@lumieducation/h5p-express": "^10.0.4",
+        "@lumieducation/h5p-server": "^10.0.4",
+        "@lumieducation/h5p-shared-state-server": "file:..",
+        "body-parser": "2.3.0",
+        "cors": "2.8.6",
+        "express": "5.2.1",
+        "express-fileupload": "1.5.2",
+        "express-session": "1.19.0",
+        "i18next": "24.2.3",
+        "i18next-fs-backend": "2.6.7",
+        "i18next-http-middleware": "3.9.8",
+        "passport": "0.7.0",
+        "passport-local": "1.0.0",
+        "tmp-promise": "3.0.3"
+    },
+    "devDependencies": {
+        "@types/cors": "2.8.19",
+        "@types/express": "5.0.6",
+        "@types/express-session": "1.19.0",
+        "@types/passport": "1.0.17",
+        "@types/passport-local": "1.0.38",
+        "ts-node": "10.9.2",
+        "ts-node-dev": "2.0.0",
+        "typescript": "5.9.3"
+    },
+    "overrides": {
+        "express": "5.2.1",
+        "@types/express-serve-static-core": "5.1.0"
+    }
+}

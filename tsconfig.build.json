@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "ES2022",
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "removeComments": false,
+        "noImplicitAny": false,
+        "sourceMap": true,
+        "baseUrl": "./",
+        "resolveJsonModule": true,
+        "declaration": true,
+        "skipLibCheck": true,
+        "outDir": "./build"
+    },
+    "include": ["src/**/*.ts"],
+    "exclude": ["node_modules", "example"]
+}
