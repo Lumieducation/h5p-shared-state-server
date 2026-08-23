@@ -2,31 +2,44 @@ name: Release
 
 on:
     push:
-        tags:
-            - 'v*.*.*'
+        branches:
+            - release
 
 env:
     NODE_VERSION: '24.19.0'
 
 jobs:
-    publish:
+    release:
         runs-on: ubuntu-latest
         permissions:
-            contents: read
+            # to be able to push the version-bump/changelog commit and tag
+            contents: write
+            # to be able to comment on issues/PRs referenced by release notes
+            issues: write
+            pull-requests: write
+            # to enable OIDC trusted publishing to npm (no NPM_TOKEN needed)
             id-token: write
         steps:
             - uses: actions/checkout@v4
+              with:
+                  # semantic-release needs full git history and tags to
+                  # compute the next version from conventional commits.
+                  fetch-depth: 0
             - uses: actions/setup-node@v4
               with:
                   node-version: ${{ env.NODE_VERSION }}
-                  registry-url: 'https://registry.npmjs.org'
-            # OIDC trusted publishing (npm's provenance/auth flow via the
-            # id-token permission above) requires npm >= 11.5.1. Node's
-            # bundled npm isn't guaranteed to be new enough, so pin it
-            # explicitly rather than relying on whatever ships with
-            # NODE_VERSION.
+                  # Deliberately no registry-url here: actions/setup-node
+                  # writes an auth-token line into .npmrc as soon as
+                  # registry-url is set, even with no NPM_TOKEN/
+                  # NODE_AUTH_TOKEN configured, which breaks npm's OIDC
+                  # trusted-publishing flow (see actions/setup-node#1440).
+            # OIDC trusted publishing requires npm >= 11.5.1 and
+            # @semantic-release/npm >= 13. Node's bundled npm isn't
+            # guaranteed to be new enough, so pin it explicitly.
             - run: npm install -g npm@^11.5.1
             - run: npm ci
             - run: npm run build
             - run: npm test
-            - run: npm publish --access public
+            - run: npx semantic-release
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

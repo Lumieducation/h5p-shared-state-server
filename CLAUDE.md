@@ -130,23 +130,44 @@ Example: `fix(sharedstateserver): reject ops without a valid content context`
 
 ## Release
 
-Publishing happens via `.github/workflows/release.yml`, triggered by pushing
-a `v*.*.*` tag: it builds, tests, and runs `npm publish`. Authentication uses
-npm's OIDC "trusted publishing" (the `id-token: write` permission in the
-workflow) — there is no `NPM_TOKEN` secret. This requires:
+Versioning and publishing are fully automated by
+[semantic-release](https://semantic-release.gitbook.io/), configured in
+`.releaserc.json` — the single-package equivalent of how the
+h5p-nodejs-library monorepo uses `lerna version --conventional-commits` +
+`lerna publish`. There is no manual version bump and no `NPM_TOKEN`.
 
-- npm >= 11.5.1 (the workflow pins this explicitly via
-  `npm install -g npm@^11.5.1` since Node's bundled npm isn't guaranteed to
-  be new enough)
-- a trusted publisher configured on the package's npmjs.com settings page,
-  pointing at this repo, the `release.yml` workflow filename, and (if used)
-  the same GitHub environment name as the workflow's `environment:` key. If
+**To cut a release:** merge/fast-forward `main` into the `release` branch and
+push it. `.github/workflows/release.yml` triggers on push to `release` and
+runs `npx semantic-release`, which:
+
+1. Reads conventional-commit messages since the last release tag (`feat:` →
+   minor, `fix:` → patch, `BREAKING CHANGE:` → major; `chore:`/`docs:`/etc.
+   don't trigger a release) — commit format is already enforced by
+   commitlint (see above), so this "just works" off normal commit hygiene.
+2. Bumps `package.json`, updates `CHANGELOG.md`, commits both back to
+   `release` with `[skip ci]`, and creates the git tag.
+3. Publishes to npm via `@semantic-release/npm`, authenticated with npm's
+   OIDC trusted publishing (`id-token: write` permission) — no stored token.
+4. Creates a GitHub Release with generated notes.
+
+If there are no release-worthy commits since the last release, the workflow
+runs and exits without publishing anything — this is expected, not a
+failure.
+
+### OIDC / trusted-publishing requirements
+
+- npm >= 11.5.1 and `@semantic-release/npm` >= 13 (both pinned in this repo
+  already) — older versions don't support OIDC and fail with `ENONPMTOKEN`.
+- `actions/setup-node` in `release.yml` deliberately omits `registry-url`:
+  setting it writes an auth-token line into `.npmrc` even with no
+  `NODE_AUTH_TOKEN` configured, which breaks the OIDC flow (see
+  [actions/setup-node#1440](https://github.com/actions/setup-node/issues/1440)).
+  Do not add `registry-url` back to fix some unrelated auth issue — it will
+  reintroduce this one.
+- a trusted publisher must be configured on the package's npmjs.com settings
+  page, pointing at this repo and the `release.yml` workflow filename. If
   that link is ever removed or the workflow file is renamed/moved, publish
   will fail until it's reconfigured on npmjs.com.
-
-Bump the version in `package.json` first (this package no longer follows
-h5p-nodejs-library's lockstep lerna versioning — version it independently
-going forward).
 
 ## Relationship to h5p-nodejs-library
 
