@@ -1,6 +1,37 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended"
-  ]
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": ["config:recommended", "group:monorepos", "group:recommended"],
+    "dependencyDashboard": true,
+    "schedule": ["before 6am on monday"],
+    "prConcurrentLimit": 10,
+    "prHourlyLimit": 50,
+    "lockFileMaintenance": {
+        "enabled": true,
+        "schedule": ["before 6am on monday"]
+    },
+    "packageRules": [
+        {
+            "updateTypes": [
+                "minor",
+                "patch",
+                "pin",
+                "digest",
+                "lockFileMaintenance"
+            ],
+            "automerge": true
+        },
+        {
+            "matchManagers": ["github-actions"],
+            "groupName": "github actions"
+        },
+        {
+            "matchPackagePrefixes": ["@types/"],
+            "groupName": "type definitions"
+        }
+    ],
+    "vulnerabilityAlerts": {
+        "schedule": ["at any time"]
+    },
+    "semanticCommits": true,
+    "semanticCommitType": "chore"
 }
