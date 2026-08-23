@@ -17,7 +17,8 @@ export default [
             '**/node_modules/',
             '**/*.d.ts',
             '**/*.config.js',
-            '**/*.config.mjs'
+            '**/*.config.mjs',
+            'example/h5p/'
         ]
     },
     { languageOptions: { globals: { ...globals.node } } },
