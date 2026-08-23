@@ -131,10 +131,22 @@ Example: `fix(sharedstateserver): reject ops without a valid content context`
 ## Release
 
 Publishing happens via `.github/workflows/release.yml`, triggered by pushing
-a `v*.*.*` tag: it builds, tests, and runs `npm publish` using the
-`NPM_TOKEN` repo secret. Bump the version in `package.json` first (this
-package no longer follows h5p-nodejs-library's lockstep lerna versioning —
-version it independently going forward).
+a `v*.*.*` tag: it builds, tests, and runs `npm publish`. Authentication uses
+npm's OIDC "trusted publishing" (the `id-token: write` permission in the
+workflow) — there is no `NPM_TOKEN` secret. This requires:
+
+- npm >= 11.5.1 (the workflow pins this explicitly via
+  `npm install -g npm@^11.5.1` since Node's bundled npm isn't guaranteed to
+  be new enough)
+- a trusted publisher configured on the package's npmjs.com settings page,
+  pointing at this repo, the `release.yml` workflow filename, and (if used)
+  the same GitHub environment name as the workflow's `environment:` key. If
+  that link is ever removed or the workflow file is renamed/moved, publish
+  will fail until it's reconfigured on npmjs.com.
+
+Bump the version in `package.json` first (this package no longer follows
+h5p-nodejs-library's lockstep lerna versioning — version it independently
+going forward).
 
 ## Relationship to h5p-nodejs-library
 

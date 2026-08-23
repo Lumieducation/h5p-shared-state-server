@@ -20,9 +20,13 @@ jobs:
               with:
                   node-version: ${{ env.NODE_VERSION }}
                   registry-url: 'https://registry.npmjs.org'
+            # OIDC trusted publishing (npm's provenance/auth flow via the
+            # id-token permission above) requires npm >= 11.5.1. Node's
+            # bundled npm isn't guaranteed to be new enough, so pin it
+            # explicitly rather than relying on whatever ships with
+            # NODE_VERSION.
+            - run: npm install -g npm@^11.5.1
             - run: npm ci
             - run: npm run build
             - run: npm test
-            - run: npm publish --provenance --access public
-              env:
-                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+            - run: npm publish --access public
