@@ -45,7 +45,7 @@
         "eslint-config-prettier": "^9.1.0",
         "globals": "^15.14.0",
         "husky": "9.1.7",
-        "prettier": "3.6.2",
+        "prettier": "3.9.9",
         "semantic-release": "^25.0.9",
         "typedoc": "0.28.20",
         "typescript": "5.9.3",
